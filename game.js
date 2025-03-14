@@ -29,16 +29,16 @@ let enemyRow = 5;
 let enemySpeed = 2;
 let enemyColor = "green";
 
-// Enemy laser properties (when i figure it out someday)
-let enemyLaserX = enemyX;
-let enemyLaserY = enemyY;
-let enemyLaserW = 10;
-let enemyLaserH = 10;
-let enemyLaserColor = "red";
-let enemyLaserSpeed = 3;
+// enemy laser if i ever figure it out lol
+// let enemyLaserX = enemyX;
+// let enemyLaserY = enemyY;
+// let enemyLaserW = 10;
+// let enemyLaserH = 10;
+// let enemyLaserColor = "red";
+// let enemyLaserSpeed = 3;
 
 // Laser projectile properties using an array to hold multiple lasers
-let laserShots = [];
+let laserShots = [];  // Each element will be an object { x, y }
 const laserW = 10;
 const laserH = 10;
 const laserColor = "red";
@@ -53,18 +53,18 @@ let moveLeft = false;
 document.addEventListener("keydown", function (event) {
     if (event.key === "ArrowRight") {
         moveRight = true;
-        // console.log("it goes right");
+        console.log("it goes right");
     }
     if (event.key === "ArrowLeft") {
         moveLeft = true;
-        // console.log("it goes left");
+        console.log("it goes left");
     }
     if (event.key === "ArrowUp") {
         // Only allow a new laser if less than 2 are active
         if (laserShots.length < 2) {
             // Add a new laser shot, capturing the ship's current x-coordinate
             laserShots.push({ x: shipX, y: shipY });
-            // console.log("pew");
+            console.log("pew");
         }
     }
 });
@@ -114,11 +114,10 @@ function playGame() {
         laserShots[i].y -= 5;
         drawObj(laserShots[i].x, laserShots[i].y, laserW, laserH, laserColor);
     }
-
-    // Removes lasers that hit the top of the canvas
+    // Remove lasers that have gone off the top of the canvas
     laserShots = laserShots.filter(laser => laser.y + laserH > 0);
 
-    // Enemy spawn
+    // Enemy spawn: draw 5 rows of 11 enemies each with a slight horizontal oscillation
     for (let i = 1; i <= 11; i++) {
         drawObj(50 + i * 55 + enemyFrame - 80, enemyY, enemyW, enemyH, enemyColor);
         drawObj(50 + i * 55 + enemyFrame - 80, enemyY + 50, enemyW, enemyH, enemyColor);
@@ -130,4 +129,4 @@ function playGame() {
     requestAnimationFrame(playGame);
 }
 
-playGame();
+// playGame();
