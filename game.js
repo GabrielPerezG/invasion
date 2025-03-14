@@ -21,29 +21,19 @@ let shipH = 45;
 let shipColor = "blue";
 
 // Enemy properties
-let enemyX = halfCW;
 let enemyY = CH - 550;
 let enemyW = 35;
 let enemyH = 35;
-let enemyRow = 5;
 let enemySpeed = 2;
 let enemyColor = "green";
 
-// enemy laser if i ever figure it out lol
-// let enemyLaserX = enemyX;
-// let enemyLaserY = enemyY;
-// let enemyLaserW = 10;
-// let enemyLaserH = 10;
-// let enemyLaserColor = "red";
-// let enemyLaserSpeed = 3;
-
-// Laser projectile properties using an array to hold multiple lasers
-let laserShots = [];  // Each element will be an object { x, y }
+// Laser projectile properties 
+let laserShots = [];
 const laserW = 10;
 const laserH = 10;
 const laserColor = "red";
 
-// Frames and enemy movement
+// Frames and enemy movement anims
 let frameCount = 0;
 let enemyFrame = 0;
 
@@ -60,9 +50,7 @@ document.addEventListener("keydown", function (event) {
         console.log("it goes left");
     }
     if (event.key === "ArrowUp") {
-        // Only allow a new laser if less than 2 are active
         if (laserShots.length < 2) {
-            // Add a new laser shot, capturing the ship's current x-coordinate
             laserShots.push({ x: shipX, y: shipY });
             console.log("pew");
         }
@@ -76,6 +64,43 @@ document.addEventListener("keyup", function (event) {
         moveLeft = false;
     }
 });
+
+let enemies = [];
+
+function createEnemies() {
+    enemies = [];
+    const rows = 5;
+    const cols = 11;
+    const xOffset = 105;         // starting x position for the grid
+    const yOffset = enemyY;     // starting y position
+    const gapX = 55;            // horizontal gap between enemies
+    const gapY = 50;            // vertical gap between enemies
+
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            enemies.push({
+                baseX: xOffset + col * gapX,
+                x: xOffset + col * gapX,
+                y: yOffset + row * gapY,
+                w: enemyW,
+                h: enemyH,
+                color: enemyColor,
+                hit: false,
+            });
+        }
+    }
+}
+
+function checkCollision(rect1, rect2) {
+    return (
+        rect1.x < rect2.x + rect2.w &&
+        rect1.x + laserW > rect2.x &&
+        rect1.y < rect2.y + rect2.h &&
+        rect1.y + laserH > rect2.y
+    );
+}
+
+createEnemies();
 
 function playGame() {
     ctx.clearRect(0, 0, CW, CH);
@@ -108,22 +133,31 @@ function playGame() {
     // Draw the ship
     drawObj(shipX, shipY, shipW, shipH, shipColor);
 
-    // Update and draw each laser shot
-    for (let i = 0; i < laserShots.length; i++) {
+    // Update and draw each laser shot and checks for collisions with enemies
+    for (let i = laserShots.length - 1; i >= 0; i--) {
+        let laser = laserShots[i];
         // Move the laser upward
-        laserShots[i].y -= 5;
-        drawObj(laserShots[i].x, laserShots[i].y, laserW, laserH, laserColor);
+        laser.y -= 5;
+        drawObj(laser.x, laser.y, laserW, laserH, laserColor);
+
+        // Check collision with each enemy
+        for (let j = enemies.length - 1; j >= 0; j--) {
+            let enemy = enemies[j];
+            if (checkCollision(laser, enemy)) {
+                // Remove the enemy and laser if a collision is detected
+                enemies.splice(j, 1);
+                laserShots.splice(i, 1);
+                break; // Exit inner loop after collision
+            }
+        }
     }
     // Remove lasers that have gone off the top of the canvas
     laserShots = laserShots.filter(laser => laser.y + laserH > 0);
 
-    // Enemy spawn: draw 5 rows of 11 enemies each with a slight horizontal oscillation
-    for (let i = 1; i <= 11; i++) {
-        drawObj(50 + i * 55 + enemyFrame - 80, enemyY, enemyW, enemyH, enemyColor);
-        drawObj(50 + i * 55 + enemyFrame - 80, enemyY + 50, enemyW, enemyH, enemyColor);
-        drawObj(50 + i * 55 + enemyFrame - 80, enemyY + 100, enemyW, enemyH, enemyColor);
-        drawObj(50 + i * 55 + enemyFrame - 80, enemyY + 150, enemyW, enemyH, enemyColor);
-        drawObj(50 + i * 55 + enemyFrame - 80, enemyY + 200, enemyW, enemyH, enemyColor);
+    // Draw enemies with x positions
+    for (let enemy of enemies) {
+        enemy.x = enemy.baseX + enemyFrame - 80;
+        drawObj(enemy.x, enemy.y, enemy.w, enemy.h, enemy.color);
     }
 
     requestAnimationFrame(playGame);
