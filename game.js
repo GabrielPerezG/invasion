@@ -21,13 +21,13 @@ let shipH = 45;
 let shipColor = "blue";
 
 // Enemy properties
+let enemyX = 105
 let enemyY = CH - 550;
 let enemyW = 35;
 let enemyH = 35;
-let enemySpeed = 2;
 let enemyColor = "green";
 
-// Laser projectile properties 
+// Laser projectile properties
 let laserShots = [];
 const laserW = 10;
 const laserH = 10;
@@ -71,7 +71,7 @@ function createEnemies() {
     enemies = [];
     const rows = 5;
     const cols = 11;
-    const xOffset = 105;         // starting x position for the grid
+    const xOffset = enemyX;     // starting x position for the grid
     const yOffset = enemyY;     // starting y position
     const gapX = 55;            // horizontal gap between enemies
     const gapY = 50;            // vertical gap between enemies
